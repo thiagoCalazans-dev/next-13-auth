@@ -1,5 +1,5 @@
 "use client";
-
+import axios from "axios";
 import { Button } from "@/components/ui/Button";
 import { Form } from "@/components/ui/Form";
 import { useState } from "react";
@@ -8,7 +8,7 @@ import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 
-const createLoginFormSchema = z.object({
+const createRegisterFormSchema = z.object({
   name: z.string().nonempty("Campo obrigatório"),
   email: z
     .string()
@@ -18,22 +18,33 @@ const createLoginFormSchema = z.object({
   password: z.string().nonempty("Campo obrigatório"),
 });
 
-type LoginForm = z.infer<typeof createLoginFormSchema>;
+type LoginForm = z.infer<typeof createRegisterFormSchema>;
 
 export default function SignUp() {
   const [isLoading, setIsLoading] = useState(false);
-  const [output, setOutput] = useState("");
 
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<LoginForm>({
-    resolver: zodResolver(createLoginFormSchema),
+    resolver: zodResolver(createRegisterFormSchema),
   });
 
-  function Login(data: any) {
-    setOutput(JSON.stringify(data, null, 2));
+  function Register(data: any) {
+    setIsLoading(true);
+
+    axios
+      .post("/api/register", data)
+      .then(() => {
+        console.log("Registered!");
+      })
+      .catch((error) => {
+        console.log(error);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   }
 
   return (
@@ -66,7 +77,7 @@ export default function SignUp() {
 "
       >
         <h1 className="text-2xl mb-4 ">Sign Up</h1>
-        <form className="flex flex-col gap-4" onSubmit={handleSubmit(Login)}>
+        <form className="flex flex-col gap-4" onSubmit={handleSubmit(Register)}>
           <Form.Control>
             <Form.Label htmlFor="Email">Name</Form.Label>
             <Form.Input
@@ -96,7 +107,7 @@ export default function SignUp() {
             />
           </Form.Control>
           <Button className="" type="submit" variant="primary">
-            Login
+            Register
           </Button>
         </form>
         <div className="mt-4 w-full text-end font-thin  ">
