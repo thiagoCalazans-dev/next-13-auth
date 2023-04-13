@@ -9,16 +9,18 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 
 const createLoginFormSchema = z.object({
+  name: z.string().nonempty("Campo obrigatório"),
   email: z
     .string()
     .nonempty("Campo obrigatório")
-    .email("Esse não é um formato de email"),
+    .email("Esse não é um formato de email")
+    .endsWith("@gcaspp.com.br", "use um email de dominio GCASPP"),
   password: z.string().nonempty("Campo obrigatório"),
 });
 
 type LoginForm = z.infer<typeof createLoginFormSchema>;
 
-export default function Home() {
+export default function SignUp() {
   const [isLoading, setIsLoading] = useState(false);
   const [output, setOutput] = useState("");
 
@@ -33,8 +35,6 @@ export default function Home() {
   function Login(data: any) {
     setOutput(JSON.stringify(data, null, 2));
   }
-
-  console.log(errors);
 
   return (
     <main
@@ -65,8 +65,17 @@ export default function Home() {
           rounded-md            
 "
       >
-        <h1 className="text-2xl mb-4 ">Sign in</h1>
+        <h1 className="text-2xl mb-4 ">Sign Up</h1>
         <form className="flex flex-col gap-4" onSubmit={handleSubmit(Login)}>
+          <Form.Control>
+            <Form.Label htmlFor="Email">Name</Form.Label>
+            <Form.Input
+              id="name"
+              disabled={isLoading}
+              register={register}
+              required
+            />
+          </Form.Control>
           <Form.Control>
             <Form.Label htmlFor="Email">Email</Form.Label>
             <Form.Input
@@ -86,19 +95,18 @@ export default function Home() {
               required
             />
           </Form.Control>
-          <Button className="mt-2" type="submit" variant="primary">
+          <Button className="" type="submit" variant="primary">
             Login
           </Button>
         </form>
-        <div className="mt-4 w-full text-end font-thin">
+        <div className="mt-4 w-full text-end font-thin  ">
           <Link
-            className="text-sm text-zinc-400 hover:underline hover:underline-offset-2 hover:decoration-0 hover:text-sky-600  dark:hover:text-white"
-            href="/signup"
+            className="text-sm text-zinc-400  hover:underline hover:underline-offset-2 hover:decoration-0 hover:text-sky-600  dark:hover:text-white"
+            href="/"
           >
-            Create a new account
+            Login
           </Link>
         </div>
-        <pre>{output}</pre>
       </div>
     </main>
   );
