@@ -7,6 +7,8 @@ import { useForm } from "react-hook-form";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 const createLoginFormSchema = z.object({
   email: z
@@ -22,6 +24,8 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [output, setOutput] = useState("");
 
+  const router = useRouter();
+
   const {
     register,
     handleSubmit,
@@ -30,11 +34,25 @@ export default function Home() {
     resolver: zodResolver(createLoginFormSchema),
   });
 
-  function Login(data: any) {
-    setOutput(JSON.stringify(data, null, 2));
-  }
+  function Login(data: LoginForm) {
+    setIsLoading(true);
 
-  console.log(errors);
+    signIn("credentials", {
+      ...data,
+      redirect: false,
+    }).then((callback) => {
+      setIsLoading(false);
+
+      if (callback?.ok) {
+        console.log("Logged in");
+        router.push("/protected");
+      }
+
+      if (callback?.error) {
+        console.log(callback.error);
+      }
+    });
+  }
 
   return (
     <main
